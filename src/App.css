@@ -4,10 +4,6 @@
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
-.hide{
-  display: none;
-  opacity: 1;
-}
 .containerDropdown{
   display: flex;
   background-color: #0093E9;
