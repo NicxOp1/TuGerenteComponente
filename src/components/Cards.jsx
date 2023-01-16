@@ -74,7 +74,8 @@ export default function Cards(props) {
     <div className='cardContainer'>
         <button className='sendObject' onClick={sendObject}>Agregar Empresa</button>
         <div className='card'>
-             {data.map((e)=>(
+             {data.length>0?
+             data.map((e)=>(
             <ul key={e.id} className='dataList'>
                 <li><i class='bx bx-fw bx-user-circle'></i>Nombre: {e.nombre}</li>
                 <li><i class='bx bx-fw bx-buildings'></i>Empresa: {e.razonSocial}</li>
@@ -82,7 +83,7 @@ export default function Cards(props) {
                 <li><i class='bx bx-fw bx-phone'></i>Teléfono: +{e.telefono}</li>
                 <li><i class='bx bx-fw bx-hash' ></i>Código: {e.codigo}</li>
             </ul>
-            ))}    
+            )):<h2>No se encontraron empresas con ese Parámetro</h2>}    
            
             <div className='footer'>
             <span> {data.length} resultados de <a href="#">{data.length}</a></span>       

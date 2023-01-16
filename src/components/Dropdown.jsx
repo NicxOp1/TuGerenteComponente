@@ -75,14 +75,16 @@ export default function Dropdown() {
     }
  /* funcion scrollbar */
     useEffect(() => {   
-      window.addEventListener("scroll",()=>{
-        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-        const scrolled = window.scrollY
-        if(Math.ceil(scrolled)===scrollable){
-           getNextData()
-           console.log("scroll llego al final")
-         }
-        });
+
+        window.addEventListener("scroll",()=>{
+          const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+          const scrolled = window.scrollY
+          if(Math.ceil(scrolled)===scrollable){
+             getNextData()
+             console.log("scroll llego al final")
+           }
+          });
+
     }, [])
   return (
     <div className='wrapper-list'>
