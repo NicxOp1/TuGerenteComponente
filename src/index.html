@@ -1,182 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Godspeed - Task Manager</title>
+    <title>Godspeed</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div id="app">
-        <!-- Server Sidebar (Discord-style left column) -->
-        <div id="server-sidebar">
-            <div class="server-icon home active" title="Home">
-                <span>📋</span>
-            </div>
-            <div class="server-divider"></div>
-            <div class="server-icon" title="Work" data-color="#5865f2">
-                <span>💼</span>
-            </div>
-            <div class="server-icon" title="Personal" data-color="#3ba55d">
-                <span>🏠</span>
-            </div>
-            <div class="server-icon" title="Projects" data-color="#ed4245">
-                <span>🚀</span>
-            </div>
-            <div class="server-icon add-server" title="Add Project">
-                <span>+</span>
-            </div>
-        </div>
+    <!-- Main Overlay Container -->
+    <div id="app" class="overlay-container">
+        <!-- Drag Handle -->
+        <div class="drag-handle"></div>
 
-        <!-- Channels Sidebar -->
-        <div id="sidebar">
-            <div class="sidebar-header">
-                <h1>Godspeed</h1>
-                <button id="settings-btn" class="icon-btn" title="Settings (S)">⚙️</button>
-            </div>
+        <!-- Close Button -->
+        <button class="close-btn" id="close-app" title="Alt+L to close">×</button>
 
-            <div class="lists-section">
-                <div class="list-item active" data-list="inbox">
-                    <span class="list-icon">📥</span>
-                    <span class="list-name">Inbox</span>
-                    <span class="task-count">0</span>
-                </div>
-                <div class="list-item" data-list="today">
-                    <span class="list-icon">📅</span>
-                    <span class="list-name">Today</span>
-                    <span class="task-count">0</span>
-                </div>
-                <div class="list-item" data-list="upcoming">
-                    <span class="list-icon">🗓️</span>
-                    <span class="list-name">Upcoming</span>
-                    <span class="task-count">0</span>
-                </div>
-                <div class="list-item" data-list="completed">
-                    <span class="list-icon">✅</span>
-                    <span class="list-name">Completed</span>
-                    <span class="task-count">0</span>
-                </div>
-            </div>
-
-            <div class="labels-section">
-                <h3>Labels</h3>
-                <div id="labels-list"></div>
-            </div>
-
-            <!-- User Bar (Discord-style) -->
-            <div class="user-bar">
-                <div class="user-avatar">
-                    <div class="avatar-circle">👤</div>
-                    <div class="status-indicator online"></div>
-                </div>
-                <div class="user-info">
-                    <div class="username">User</div>
-                    <div class="user-status">Online</div>
-                </div>
-                <button class="user-settings-btn" id="settings-btn-user" title="Settings">⚙</button>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div id="main-content">
-            <div class="content-header">
-                <h2 id="current-list-title">Inbox</h2>
-                <div class="header-actions">
-                    <button id="cmd-palette-btn" class="btn-secondary" title="Command Palette (Ctrl+K)">Ctrl+K</button>
-                </div>
-            </div>
-
-            <div class="quick-entry">
+        <!-- Quick Entry Command Input -->
+        <div class="command-section">
+            <div class="command-input-wrapper">
+                <span class="command-icon">⚡</span>
                 <input
                     type="text"
-                    id="quick-entry-input"
-                    placeholder="Add a task... (press Enter to add, use @label #date)"
+                    id="command-input"
+                    class="command-input"
+                    placeholder="What needs to be done?"
                     autocomplete="off"
+                    autofocus
                 >
             </div>
-
-            <div id="tasks-container"></div>
+            <div class="command-hint">Press <kbd>Enter</kbd> to create • <kbd>↑↓</kbd> to navigate • <kbd>Esc</kbd> to close</div>
         </div>
-    </div>
 
-    <!-- Command Palette Modal -->
-    <div id="command-palette" class="modal hidden">
-        <div class="modal-content command-palette-content">
-            <input
-                type="text"
-                id="command-input"
-                placeholder="Type a command..."
-                autocomplete="off"
-            >
-            <div id="command-suggestions"></div>
+        <!-- Task Creation Panel (appears when typing) -->
+        <div id="task-panel" class="task-panel hidden">
+            <div class="panel-section">
+                <label class="panel-label">Due</label>
+                <div class="date-time-picker">
+                    <input type="text" id="quick-date" placeholder="tomorrow, 3d, next monday..." class="date-input">
+                    <div class="time-picker hidden" id="time-picker-dropdown">
+                        <div class="time-preset" data-time="9:00">Morning (9:00 AM)</div>
+                        <div class="time-preset" data-time="12:00">Noon (12:00 PM)</div>
+                        <div class="time-preset" data-time="15:00">Afternoon (3:00 PM)</div>
+                        <div class="time-preset" data-time="18:00">Evening (6:00 PM)</div>
+                        <div class="time-divider"></div>
+                        <div class="custom-time">
+                            <input type="time" id="custom-time-input" class="time-input-field">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <label class="panel-label">Labels</label>
+                <div class="labels-input-wrapper">
+                    <input type="text" id="labels-input" placeholder="Add labels..." class="labels-input">
+                    <div id="label-suggestions" class="label-suggestions hidden"></div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <label class="panel-label">Priority</label>
+                <div class="priority-selector">
+                    <button class="priority-btn" data-priority="low">
+                        <span class="priority-dot low"></span>
+                        Low
+                    </button>
+                    <button class="priority-btn" data-priority="medium">
+                        <span class="priority-dot medium"></span>
+                        Medium
+                    </button>
+                    <button class="priority-btn active" data-priority="high">
+                        <span class="priority-dot high"></span>
+                        High
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel-actions">
+                <button class="btn-cancel" id="cancel-task">Cancel</button>
+                <button class="btn-create" id="create-task">Create Task</button>
+            </div>
+        </div>
+
+        <!-- Tasks List -->
+        <div id="tasks-list" class="tasks-list">
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state">
+                <div class="empty-icon">✨</div>
+                <div class="empty-text">No tasks yet</div>
+                <div class="empty-subtext">Type above to create your first task</div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <div class="footer-stats">
+            <div class="stat">
+                <span class="stat-value" id="total-count">0</span>
+                <span class="stat-label">total</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="today-count">0</span>
+                <span class="stat-label">today</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="completed-count">0</span>
+                <span class="stat-label">done</span>
+            </div>
+            <button class="settings-icon" id="settings-btn" title="Settings">⚙️</button>
         </div>
     </div>
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal hidden">
-        <div class="modal-content settings-content">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
             <div class="modal-header">
-                <h2>Settings</h2>
-                <button id="close-settings" class="close-btn">×</button>
+                <h3>Settings</h3>
+                <button class="modal-close" id="close-settings">×</button>
             </div>
-            <div class="settings-body">
+            <div class="modal-body">
                 <div class="setting-group">
-                    <label for="airtable-api-key">Airtable API Key</label>
-                    <input type="password" id="airtable-api-key" placeholder="Enter your Airtable API key">
-                    <small>Get your API key from <a href="https://airtable.com/account" target="_blank">Airtable Account</a></small>
+                    <label>Airtable API Key</label>
+                    <input type="password" id="airtable-api-key" placeholder="Enter your API key">
                 </div>
                 <div class="setting-group">
-                    <label for="airtable-base-id">Airtable Base ID</label>
+                    <label>Base ID</label>
                     <input type="text" id="airtable-base-id" placeholder="appXXXXXXXXXXXXXX">
-                    <small>Found in your Airtable base URL</small>
                 </div>
                 <div class="setting-group">
-                    <label for="airtable-table-name">Table Name</label>
-                    <input type="text" id="airtable-table-name" placeholder="Tasks" value="Tasks">
-                    <small>The name of the table in your base</small>
+                    <label>Table Name</label>
+                    <input type="text" id="airtable-table-name" value="tasks" placeholder="tasks">
                 </div>
-                <button id="save-settings" class="btn-primary">Save Settings</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Task Detail Modal -->
-    <div id="task-detail-modal" class="modal hidden">
-        <div class="modal-content task-detail-content">
-            <div class="task-detail-header">
-                <input type="checkbox" id="task-detail-checkbox" class="task-checkbox">
-                <input type="text" id="task-detail-title" class="task-detail-title-input" placeholder="Task title">
-                <button id="close-task-detail" class="close-btn">×</button>
-            </div>
-            <div class="task-detail-body">
-                <div class="detail-section">
-                    <label>Due Date</label>
-                    <input type="text" id="task-detail-date" placeholder="e.g., tomorrow, 3d, next monday">
-                </div>
-                <div class="detail-section">
-                    <label>Labels</label>
-                    <input type="text" id="task-detail-labels" placeholder="Add labels (comma separated)">
-                </div>
-                <div class="detail-section">
-                    <label>Notes</label>
-                    <textarea id="task-detail-notes" placeholder="Add notes..."></textarea>
-                </div>
-                <div class="detail-actions">
-                    <button id="save-task-detail" class="btn-primary">Save Changes</button>
-                    <button id="delete-task" class="btn-danger">Delete Task</button>
-                </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancel-settings">Cancel</button>
+                <button class="btn-create" id="save-settings">Save</button>
             </div>
         </div>
     </div>
 
     <div id="notification" class="notification hidden"></div>
-
-    <div class="keyboard-hints">
-        <span class="hint">Ctrl+K Command Palette</span>
-        <span class="hint">Ctrl+Shift+A Quick Entry</span>
-        <span class="hint">Enter New Task</span>
-        <span class="hint">S Settings</span>
-    </div>
 
     <script src="js/airtable-service.js"></script>
     <script src="js/ui.js"></script>

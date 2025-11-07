@@ -8,13 +8,17 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1100,
-    height: 600,
-    minWidth: 900,
-    minHeight: 500,
-    backgroundColor: '#0a0a0a',
-    titleBarStyle: 'hiddenInset',
-    vibrancy: 'dark',
+    width: 700,
+    height: 550,
+    minWidth: 600,
+    minHeight: 450,
+    backgroundColor: '#0c0c0c',
+    titleBarStyle: 'hidden',
+    frame: false,
+    transparent: true,
+    roundedCorners: true,
+    vibrancy: 'ultra-dark',
+    center: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -29,13 +33,14 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 
-  // Global shortcut for quick entry (Cmd/Ctrl + Shift + A)
-  globalShortcut.register('CommandOrControl+Shift+A', () => {
-    if (mainWindow.isMinimized()) {
-      mainWindow.restore();
+  // Global shortcut for quick entry (Alt+L)
+  globalShortcut.register('Alt+L', () => {
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+      mainWindow.focus();
     }
-    mainWindow.show();
-    mainWindow.focus();
     mainWindow.webContents.send('trigger-quick-entry');
   });
 
