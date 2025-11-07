@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Godspeed - Task Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <div class="sidebar-header">
+                <h1>Godspeed</h1>
+                <button id="settings-btn" class="icon-btn" title="Settings (S)">⚙️</button>
+            </div>
+
+            <div class="lists-section">
+                <div class="list-item active" data-list="inbox">
+                    <span class="list-icon">📥</span>
+                    <span class="list-name">Inbox</span>
+                    <span class="task-count">0</span>
+                </div>
+                <div class="list-item" data-list="today">
+                    <span class="list-icon">📅</span>
+                    <span class="list-name">Today</span>
+                    <span class="task-count">0</span>
+                </div>
+                <div class="list-item" data-list="upcoming">
+                    <span class="list-icon">🗓️</span>
+                    <span class="list-name">Upcoming</span>
+                    <span class="task-count">0</span>
+                </div>
+                <div class="list-item" data-list="completed">
+                    <span class="list-icon">✅</span>
+                    <span class="list-name">Completed</span>
+                    <span class="task-count">0</span>
+                </div>
+            </div>
+
+            <div class="labels-section">
+                <h3>Labels</h3>
+                <div id="labels-list"></div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content">
+            <div class="content-header">
+                <h2 id="current-list-title">Inbox</h2>
+                <div class="header-actions">
+                    <button id="cmd-palette-btn" class="btn-secondary" title="Command Palette (Cmd+K)">⌘ K</button>
+                </div>
+            </div>
+
+            <div class="quick-entry">
+                <input
+                    type="text"
+                    id="quick-entry-input"
+                    placeholder="Add a task... (press Enter to add, use @label #date)"
+                    autocomplete="off"
+                >
+            </div>
+
+            <div id="tasks-container"></div>
+        </div>
+    </div>
+
+    <!-- Command Palette Modal -->
+    <div id="command-palette" class="modal hidden">
+        <div class="modal-content command-palette-content">
+            <input
+                type="text"
+                id="command-input"
+                placeholder="Type a command..."
+                autocomplete="off"
+            >
+            <div id="command-suggestions"></div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content settings-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="close-settings" class="close-btn">×</button>
+            </div>
+            <div class="settings-body">
+                <div class="setting-group">
+                    <label for="airtable-api-key">Airtable API Key</label>
+                    <input type="password" id="airtable-api-key" placeholder="Enter your Airtable API key">
+                    <small>Get your API key from <a href="https://airtable.com/account" target="_blank">Airtable Account</a></small>
+                </div>
+                <div class="setting-group">
+                    <label for="airtable-base-id">Airtable Base ID</label>
+                    <input type="text" id="airtable-base-id" placeholder="appXXXXXXXXXXXXXX">
+                    <small>Found in your Airtable base URL</small>
+                </div>
+                <div class="setting-group">
+                    <label for="airtable-table-name">Table Name</label>
+                    <input type="text" id="airtable-table-name" placeholder="Tasks" value="Tasks">
+                    <small>The name of the table in your base</small>
+                </div>
+                <button id="save-settings" class="btn-primary">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div id="task-detail-modal" class="modal hidden">
+        <div class="modal-content task-detail-content">
+            <div class="task-detail-header">
+                <input type="checkbox" id="task-detail-checkbox" class="task-checkbox">
+                <input type="text" id="task-detail-title" class="task-detail-title-input" placeholder="Task title">
+                <button id="close-task-detail" class="close-btn">×</button>
+            </div>
+            <div class="task-detail-body">
+                <div class="detail-section">
+                    <label>Due Date</label>
+                    <input type="text" id="task-detail-date" placeholder="e.g., tomorrow, 3d, next monday">
+                </div>
+                <div class="detail-section">
+                    <label>Labels</label>
+                    <input type="text" id="task-detail-labels" placeholder="Add labels (comma separated)">
+                </div>
+                <div class="detail-section">
+                    <label>Notes</label>
+                    <textarea id="task-detail-notes" placeholder="Add notes..."></textarea>
+                </div>
+                <div class="detail-actions">
+                    <button id="save-task-detail" class="btn-primary">Save Changes</button>
+                    <button id="delete-task" class="btn-danger">Delete Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification hidden"></div>
+
+    <div class="keyboard-hints">
+        <span class="hint">⌘K Command Palette</span>
+        <span class="hint">⌘+Shift+A Quick Entry</span>
+        <span class="hint">Enter New Task</span>
+        <span class="hint">S Settings</span>
+    </div>
+
+    <script src="js/airtable-service.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

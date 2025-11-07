@@ -1,70 +1,213 @@
-# Getting Started with Create React App
+# Godspeed Airtable Task Manager
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A fast, keyboard-driven task management application built with Electron.js and Airtable, inspired by [Godspeed](https://godspeedapp.com/).
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+### ⚡ Lightning Fast & Keyboard-Driven
+- 100% keyboard navigation support
+- Command palette (⌘K / Ctrl+K) for quick access to all features
+- Quick entry for rapid task capture (⌘+Shift+A)
+- Instant shortcuts for navigation (1-4 for list switching)
 
-### `npm start`
+### 📋 Smart Task Management
+- **Natural Language Date Parsing**: Use phrases like "tomorrow", "3d", "next monday"
+- **Quick Entry Syntax**:
+  - Add labels with `@label`
+  - Set due dates with `#tomorrow` or `#3d`
+  - Example: "Buy groceries @shopping #tomorrow"
+- **Smart Lists**: Inbox, Today, Upcoming, Completed
+- **Label Organization**: Automatic label extraction and filtering
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🔄 Airtable Integration
+- Real-time sync with your Airtable base
+- Store tasks, due dates, labels, and notes
+- Works offline with Electron's storage
+- Secure API key storage
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🎨 Beautiful Dark UI
+- Sleek, modern dark theme
+- Smooth animations and transitions
+- Minimal, distraction-free interface
+- Visual indicators for overdue and today's tasks
 
-### `npm test`
+## Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (v16 or higher)
+- npm or yarn
+- An [Airtable](https://airtable.com) account
 
-### `npm run build`
+## Airtable Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Create a new Airtable base or use an existing one
+2. Create a table called "Tasks" with the following fields:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+| Field Name | Field Type | Description |
+|------------|-----------|-------------|
+| Name | Single line text | Task title (required) |
+| Status | Single select | Task status (default: Todo) |
+| Completed | Checkbox | Whether the task is completed |
+| DueDate | Date | When the task is due |
+| Labels | Single line text | Comma-separated labels |
+| Notes | Long text | Additional task notes |
+| Created | Date | When the task was created |
+| CompletedDate | Date | When the task was completed |
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Get your API credentials:
+   - **API Key**: Go to https://airtable.com/account and generate a personal access token
+   - **Base ID**: Found in your Airtable API docs (starts with "app...")
 
-### `npm run eject`
+## Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd TuGerenteComponente
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. Install dependencies:
+```bash
+npm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. Start the application:
+```bash
+npm start
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+4. Configure Airtable:
+   - Click the settings icon or press `S`
+   - Enter your Airtable API Key
+   - Enter your Airtable Base ID
+   - Confirm the table name (default: "Tasks")
+   - Click "Save Settings"
 
-## Learn More
+## Usage
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Quick Entry
+- Focus on the input at the top of the screen
+- Type your task with optional labels and dates:
+  ```
+  Complete project report @work #friday
+  Call dentist #tomorrow
+  Buy groceries @personal @shopping #3d
+  ```
+- Press Enter to create the task
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Keyboard Shortcuts
 
-### Code Splitting
+| Shortcut | Action |
+|----------|--------|
+| ⌘/Ctrl + K | Open command palette |
+| ⌘/Ctrl + Shift + A | Quick entry (global) |
+| S | Open settings |
+| 1 | Go to Inbox |
+| 2 | Go to Today |
+| 3 | Go to Upcoming |
+| 4 | Go to Completed |
+| Esc | Close modal |
+| Enter | Create task (in quick entry) |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Task Management
+- Click a task to view/edit details
+- Check the checkbox to complete a task
+- Click on labels to filter by that label
+- Use natural language for dates: "tomorrow", "next week", "in 3 days"
 
-### Analyzing the Bundle Size
+### Command Palette
+- Press ⌘K or Ctrl+K to open
+- Search for commands by typing
+- Use arrow keys to navigate
+- Press Enter to execute
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Development
 
-### Making a Progressive Web App
+Run in development mode with DevTools:
+```bash
+npm run dev
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Project Structure
 
-### Advanced Configuration
+```
+.
+├── main.js                 # Electron main process
+├── src/
+│   ├── index.html         # Main application UI
+│   ├── css/
+│   │   └── styles.css     # Application styles
+│   └── js/
+│       ├── airtable-service.js  # Airtable API integration
+│       ├── ui.js                # UI helper functions
+│       └── app.js               # Main application logic
+├── package.json
+└── README.md
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Features in Detail
 
-### Deployment
+### Natural Language Date Parsing
+Uses [chrono-node](https://github.com/wanasit/chrono) to parse natural language dates:
+- "tomorrow"
+- "next friday"
+- "in 3 days" or "3d"
+- "oct 14 at noon"
+- "2 weeks from now"
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Task Syntax
+When creating tasks, you can use:
+- `@label` - Add a label to the task
+- `#date` - Set a due date using natural language
+- Multiple labels: `@work @urgent @project`
 
-### `npm run build` fails to minify
+Example:
+```
+Review PR for authentication feature @code-review @urgent #today
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### List Views
+- **Inbox**: All incomplete tasks
+- **Today**: Tasks due today
+- **Upcoming**: Tasks due after today
+- **Completed**: All completed tasks
+
+### Label Filtering
+- Click any label in the sidebar to filter tasks
+- Labels are automatically extracted from all tasks
+- Each label gets a unique color
+
+## Troubleshooting
+
+### Can't connect to Airtable
+- Verify your API key is correct
+- Check that your Base ID starts with "app"
+- Ensure the table name matches exactly (case-sensitive)
+- Check your internet connection
+
+### Tasks not loading
+- Open DevTools (npm run dev) and check console
+- Verify Airtable API permissions
+- Ensure table structure matches requirements
+
+### Global shortcut not working
+- Make sure the app has accessibility permissions (macOS)
+- Try restarting the application
+
+## Built With
+
+- [Electron](https://www.electronjs.org/) - Desktop application framework
+- [Airtable](https://airtable.com) - Cloud-based database
+- [chrono-node](https://github.com/wanasit/chrono) - Natural language date parser
+- [electron-store](https://github.com/sindresorhus/electron-store) - Settings storage
+
+## Inspiration
+
+This project is inspired by [Godspeed](https://godspeedapp.com/), a keyboard-driven task manager for macOS and iOS.
+
+## License
+
+MIT
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
