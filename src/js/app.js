@@ -163,6 +163,10 @@ function setupEventListeners() {
 
     // Settings
     document.getElementById('settings-btn').addEventListener('click', openSettings);
+    const userSettingsBtn = document.getElementById('settings-btn-user');
+    if (userSettingsBtn) {
+        userSettingsBtn.addEventListener('click', openSettings);
+    }
     document.getElementById('close-settings').addEventListener('click', () => hideModal('settings-modal'));
     document.getElementById('save-settings').addEventListener('click', saveSettings);
 

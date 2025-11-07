@@ -8,7 +8,27 @@
 </head>
 <body>
     <div id="app">
-        <!-- Sidebar -->
+        <!-- Server Sidebar (Discord-style left column) -->
+        <div id="server-sidebar">
+            <div class="server-icon home active" title="Home">
+                <span>📋</span>
+            </div>
+            <div class="server-divider"></div>
+            <div class="server-icon" title="Work" data-color="#5865f2">
+                <span>💼</span>
+            </div>
+            <div class="server-icon" title="Personal" data-color="#3ba55d">
+                <span>🏠</span>
+            </div>
+            <div class="server-icon" title="Projects" data-color="#ed4245">
+                <span>🚀</span>
+            </div>
+            <div class="server-icon add-server" title="Add Project">
+                <span>+</span>
+            </div>
+        </div>
+
+        <!-- Channels Sidebar -->
         <div id="sidebar">
             <div class="sidebar-header">
                 <h1>Godspeed</h1>
@@ -41,6 +61,19 @@
             <div class="labels-section">
                 <h3>Labels</h3>
                 <div id="labels-list"></div>
+            </div>
+
+            <!-- User Bar (Discord-style) -->
+            <div class="user-bar">
+                <div class="user-avatar">
+                    <div class="avatar-circle">👤</div>
+                    <div class="status-indicator online"></div>
+                </div>
+                <div class="user-info">
+                    <div class="username">User</div>
+                    <div class="user-status">Online</div>
+                </div>
+                <button class="user-settings-btn" id="settings-btn-user" title="Settings">⚙</button>
             </div>
         </div>
 
