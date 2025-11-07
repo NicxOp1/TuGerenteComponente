@@ -237,6 +237,8 @@ function setupEventListeners() {
     commandInput.addEventListener('input', () => {
         if (commandInput.value.trim().length > 0) {
             taskPanel.classList.remove('hidden');
+            // Apply predictions when panel opens
+            applyPredictions();
         } else {
             taskPanel.classList.add('hidden');
         }
@@ -269,6 +271,8 @@ function setupEventListeners() {
             document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentType = btn.dataset.type;
+            // Apply smart suggestions when type changes
+            applySmartSuggestions();
         });
     });
 
@@ -284,6 +288,8 @@ function setupEventListeners() {
     // Area selector
     document.getElementById('area-select').addEventListener('change', (e) => {
         currentArea = e.target.value;
+        // Apply smart suggestions when area changes
+        applySmartSuggestions();
     });
 
     // Assigned to selector
@@ -330,6 +336,84 @@ function setupEventListeners() {
             timePickerDropdown.classList.add('hidden');
         }
     });
+}
+
+// Apply predictions based on user history
+function applyPredictions() {
+    if (allTasks.length === 0) return;
+
+    const predictions = airtableService.getPredictions(allTasks, currentUserDiscordId);
+
+    // Only apply if confidence is high enough (> 50%)
+    if (predictions.confidence < 0.5) return;
+
+    // Apply predicted type
+    if (predictions.type) {
+        currentType = predictions.type;
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        const typeBtn = document.querySelector(`.type-btn[data-type="${predictions.type}"]`);
+        if (typeBtn) typeBtn.classList.add('active');
+    }
+
+    // Apply predicted area
+    if (predictions.area) {
+        currentArea = predictions.area;
+        document.getElementById('area-select').value = predictions.area;
+    }
+
+    // Apply predicted priority
+    if (predictions.priority) {
+        currentPriority = predictions.priority;
+        document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
+        const priorityBtn = document.querySelector(`.priority-btn[data-priority="${predictions.priority}"]`);
+        if (priorityBtn) priorityBtn.classList.add('active');
+    }
+
+    // Apply predicted assignee
+    if (predictions.assignedTo) {
+        currentAssignedTo = predictions.assignedTo;
+        document.getElementById('assigned-to-select').value = predictions.assignedTo;
+    }
+
+    // Show prediction indicator
+    showPredictionIndicator(predictions.confidence);
+}
+
+// Apply smart suggestions based on current type and area
+function applySmartSuggestions() {
+    const suggestions = airtableService.getSmartSuggestions(currentType, currentArea);
+
+    // Update priority suggestion
+    if (suggestions.priority && !currentPriority) {
+        currentPriority = suggestions.priority;
+        document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
+        const priorityBtn = document.querySelector(`.priority-btn[data-priority="${suggestions.priority}"]`);
+        if (priorityBtn) priorityBtn.classList.add('active');
+    }
+
+    // Highlight suggested assignees in dropdown
+    const assigneeSelect = document.getElementById('assigned-to-select');
+    Array.from(assigneeSelect.options).forEach(option => {
+        const userId = option.value;
+        if (!userId) return;
+
+        const isSuggested = suggestions.assignees.some(u => u.id === userId);
+        if (isSuggested) {
+            option.style.background = 'rgba(255, 204, 0, 0.15)';
+            option.style.color = 'var(--accent)';
+        } else {
+            option.style.background = '';
+            option.style.color = '';
+        }
+    });
+}
+
+// Show prediction indicator
+function showPredictionIndicator(confidence) {
+    const percentage = Math.round(confidence * 100);
+    if (percentage >= 50) {
+        showNotification(`Predicciones aplicadas (${percentage}% de confianza)`, 'info');
+    }
 }
 
 // Create task from input
@@ -510,9 +594,46 @@ function showNotification(message, type = 'success') {
 }
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+
+    // Initialize wheel picker
+    if (typeof wheelPickerManager !== 'undefined') {
+        wheelPickerManager.init();
+    }
+
+    // Fade out backdrop after 1 second
+    setTimeout(() => {
+        const backdrop = document.getElementById('app-backdrop');
+        if (backdrop) {
+            backdrop.classList.add('hiding');
+            setTimeout(() => {
+                backdrop.style.display = 'none';
+            }, 350); // Match animation duration
+        }
+    }, 1000);
+});
 
 // Listen for trigger from main process
 ipcRenderer.on('trigger-quick-entry', () => {
     document.getElementById('command-input').focus();
+
+    // Show backdrop again briefly
+    const backdrop = document.getElementById('app-backdrop');
+    if (backdrop) {
+        backdrop.style.display = 'block';
+        backdrop.classList.remove('hiding');
+        backdrop.style.animation = 'none';
+        setTimeout(() => {
+            backdrop.style.animation = 'backdropFadeIn var(--transition-slow) ease-out forwards';
+        }, 10);
+
+        // Fade out after 1 second
+        setTimeout(() => {
+            backdrop.classList.add('hiding');
+            setTimeout(() => {
+                backdrop.style.display = 'none';
+            }, 350);
+        }, 1000);
+    }
 });

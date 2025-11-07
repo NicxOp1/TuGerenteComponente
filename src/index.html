@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Backdrop blur effect -->
+    <div id="app-backdrop" class="app-backdrop"></div>
+
     <!-- Main Overlay Container -->
     <div id="app" class="overlay-container">
         <!-- Drag Handle -->
@@ -84,15 +87,58 @@
                 <label class="panel-label">Fecha límite</label>
                 <div class="date-time-picker">
                     <input type="text" id="quick-date" placeholder="mañana, 3d, próximo lunes..." class="date-input">
-                    <div class="time-picker hidden" id="time-picker-dropdown">
-                        <div class="time-preset" data-time="9:00">Mañana (9:00 AM)</div>
-                        <div class="time-preset" data-time="12:00">Mediodía (12:00 PM)</div>
-                        <div class="time-preset" data-time="15:00">Tarde (3:00 PM)</div>
-                        <div class="time-preset" data-time="18:00">Noche (6:00 PM)</div>
-                        <div class="time-divider"></div>
-                        <div class="custom-time">
-                            <input type="time" id="custom-time-input" class="time-input-field">
+                    <button type="button" class="wheel-picker-trigger" id="open-wheel-picker">
+                        <span class="wheel-icon">🎯</span>
+                        Usar rueda
+                    </button>
+                </div>
+            </div>
+
+            <!-- Wheel Date/Time Picker Modal -->
+            <div id="wheel-picker-modal" class="modal hidden">
+                <div class="modal-overlay"></div>
+                <div class="modal-content wheel-picker-content">
+                    <div class="modal-header">
+                        <h3>Ajustar fecha y hora</h3>
+                        <button class="modal-close" id="close-wheel-picker">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="wheel-picker-container">
+                            <!-- Days Wheel -->
+                            <div class="wheel-column">
+                                <div class="wheel-label">Días</div>
+                                <div class="wheel" id="days-wheel" data-type="days">
+                                    <canvas id="days-canvas" width="120" height="120"></canvas>
+                                    <div class="wheel-value" id="days-value">0</div>
+                                </div>
+                            </div>
+
+                            <!-- Hours Wheel -->
+                            <div class="wheel-column">
+                                <div class="wheel-label">Horas</div>
+                                <div class="wheel" id="hours-wheel" data-type="hours">
+                                    <canvas id="hours-canvas" width="120" height="120"></canvas>
+                                    <div class="wheel-value" id="hours-value">0</div>
+                                </div>
+                            </div>
+
+                            <!-- Minutes Wheel -->
+                            <div class="wheel-column">
+                                <div class="wheel-label">Minutos</div>
+                                <div class="wheel" id="minutes-wheel" data-type="minutes">
+                                    <canvas id="minutes-canvas" width="120" height="120"></canvas>
+                                    <div class="wheel-value" id="minutes-value">0</div>
+                                </div>
+                            </div>
                         </div>
+                        <div class="wheel-preview">
+                            <span class="preview-label">Vista previa:</span>
+                            <span class="preview-value" id="wheel-preview">Ahora</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-cancel" id="cancel-wheel-picker">Cancelar</button>
+                        <button class="btn-create" id="apply-wheel-picker">Aplicar</button>
                     </div>
                 </div>
             </div>
@@ -220,6 +266,7 @@
     <div id="notification" class="notification hidden"></div>
 
     <script src="js/airtable-service.js"></script>
+    <script src="js/wheel-picker.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

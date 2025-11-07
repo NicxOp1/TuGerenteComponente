@@ -371,6 +371,133 @@ class AirtableService {
             return taskDate.toLocaleDateString('en-US', options);
         }
     }
+
+    // Prediction Algorithm
+    getPredictions(tasks, currentUserDiscordId) {
+        if (!tasks || tasks.length === 0) {
+            return {
+                type: 'Tarea',
+                area: '',
+                assignedTo: null,
+                priority: 'Media',
+                confidence: 0
+            };
+        }
+
+        // Get tasks created by current user (as requestedBy)
+        const currentUser = this.getUserByDiscordId(currentUserDiscordId);
+        const userTasks = currentUser
+            ? tasks.filter(t => t.requestedBy === currentUser.id)
+            : tasks;
+
+        // Get recent tasks (last 20)
+        const recentTasks = userTasks.slice(-20);
+
+        // Count frequencies
+        const typeCount = {};
+        const areaCount = {};
+        const assigneeCount = {};
+        const priorityCount = {};
+
+        recentTasks.forEach(task => {
+            // Count types
+            typeCount[task.type] = (typeCount[task.type] || 0) + 1;
+
+            // Count areas
+            if (task.area) {
+                areaCount[task.area] = (areaCount[task.area] || 0) + 1;
+            }
+
+            // Count assignees
+            if (task.assignedTo) {
+                assigneeCount[task.assignedTo] = (assigneeCount[task.assignedTo] || 0) + 1;
+            }
+
+            // Count priorities
+            if (task.priority) {
+                priorityCount[task.priority] = (priorityCount[task.priority] || 0) + 1;
+            }
+        });
+
+        // Find most common values
+        const mostCommonType = this.getMostCommon(typeCount) || 'Tarea';
+        const mostCommonArea = this.getMostCommon(areaCount) || '';
+        const mostCommonAssignee = this.getMostCommon(assigneeCount) || null;
+        const mostCommonPriority = this.getMostCommon(priorityCount) || 'Media';
+
+        // Calculate confidence (0-1)
+        const confidence = recentTasks.length / 20;
+
+        return {
+            type: mostCommonType,
+            area: mostCommonArea,
+            assignedTo: mostCommonAssignee,
+            priority: mostCommonPriority,
+            confidence: confidence
+        };
+    }
+
+    getMostCommon(countObject) {
+        let maxCount = 0;
+        let mostCommon = null;
+
+        for (const [key, count] of Object.entries(countObject)) {
+            if (count > maxCount) {
+                maxCount = count;
+                mostCommon = key;
+            }
+        }
+
+        return mostCommon;
+    }
+
+    // Smart suggestions based on context
+    getSmartSuggestions(currentType, currentArea) {
+        const suggestions = {
+            assignees: [],
+            priority: 'Media'
+        };
+
+        // Role-based assignee suggestions
+        const roleMapping = {
+            'Tarea': ['Developer', 'Operations'],
+            'Ticket': ['Customer Success', 'Operations'],
+            'Bug': ['Developer'],
+            'Feature': ['Developer', 'CEO']
+        };
+
+        const areaRoleMapping = {
+            'IA': ['Developer', 'Prompt Engineer'],
+            'Contratos': ['Operations', 'CEO'],
+            'Dev': ['Developer'],
+            'Operaciones': ['Operations'],
+            'Marketing': ['Customer Success', 'CEO']
+        };
+
+        // Get relevant roles
+        let relevantRoles = roleMapping[currentType] || [];
+        if (currentArea && areaRoleMapping[currentArea]) {
+            relevantRoles = [...new Set([...relevantRoles, ...areaRoleMapping[currentArea]])];
+        }
+
+        // Filter users by relevant roles
+        suggestions.assignees = this.discordUsers.filter(user =>
+            relevantRoles.includes(user.role)
+        );
+
+        // Smart priority suggestion
+        if (currentType === 'Bug') {
+            suggestions.priority = 'Alta';
+        } else if (currentType === 'Ticket') {
+            suggestions.priority = 'Alta';
+        } else if (currentType === 'Feature') {
+            suggestions.priority = 'Media';
+        } else {
+            suggestions.priority = 'Media';
+        }
+
+        return suggestions;
+    }
 }
 
 // Create a singleton instance
