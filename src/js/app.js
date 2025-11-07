@@ -446,6 +446,7 @@ async function createTaskFromPanel() {
     const title = document.getElementById('command-input').value.trim();
     const dateText = document.getElementById('quick-date').value.trim();
     const labelsText = document.getElementById('labels-input').value.trim();
+    const notesText = document.getElementById('notes-input').value.trim();
 
     if (!title) {
         showNotification('Por favor ingresa un título', 'error');
@@ -468,16 +469,36 @@ async function createTaskFromPanel() {
         }
     }
 
+    // Prevenir auto-asignación si el usuario se está asignando a sí mismo
+    let finalAssignedTo = currentAssignedTo;
+    if (currentUserDiscordId && requestedBy && currentAssignedTo === requestedBy) {
+        showNotification('No puedes asignarte tareas a ti mismo', 'error');
+        return;
+    }
+
+    console.log('Creating task with data:', {
+        title,
+        type: currentType,
+        area: currentArea,
+        assignedTo: finalAssignedTo,
+        requestedBy,
+        priority: currentPriority,
+        labels,
+        dueDate,
+        notes: notesText
+    });
+
     try {
         await airtableService.createTask({
             title,
             type: currentType,
             area: currentArea || null,
-            assignedTo: currentAssignedTo,
+            assignedTo: finalAssignedTo,
             requestedBy: requestedBy,
             priority: currentPriority,
             labels,
-            dueDate
+            dueDate,
+            notes: notesText || null
         });
 
         await loadTasks();
@@ -485,7 +506,7 @@ async function createTaskFromPanel() {
         showNotification('¡Tarea creada!', 'success');
     } catch (error) {
         console.error('Failed to create task:', error);
-        showNotification('Error al crear tarea', 'error');
+        showNotification('Error al crear tarea: ' + error.message, 'error');
     }
 }
 
@@ -494,6 +515,7 @@ function resetForm() {
     document.getElementById('command-input').value = '';
     document.getElementById('quick-date').value = '';
     document.getElementById('labels-input').value = '';
+    document.getElementById('notes-input').value = '';
     document.getElementById('area-select').value = '';
     document.getElementById('assigned-to-select').value = '';
     document.getElementById('task-panel').classList.add('hidden');
@@ -506,11 +528,13 @@ function resetForm() {
 
     // Reset type buttons
     document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.type-btn[data-type="Tarea"]').classList.add('active');
+    const tareaBtn = document.querySelector('.type-btn[data-type="Tarea"]');
+    if (tareaBtn) tareaBtn.classList.add('active');
 
     // Reset priority buttons
     document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.priority-btn[data-priority="Alta"]').classList.add('active');
+    const altaBtn = document.querySelector('.priority-btn[data-priority="Alta"]');
+    if (altaBtn) altaBtn.classList.add('active');
 
     document.getElementById('command-input').focus();
 }
@@ -601,39 +625,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof wheelPickerManager !== 'undefined') {
         wheelPickerManager.init();
     }
-
-    // Fade out backdrop after 1 second
-    setTimeout(() => {
-        const backdrop = document.getElementById('app-backdrop');
-        if (backdrop) {
-            backdrop.classList.add('hiding');
-            setTimeout(() => {
-                backdrop.style.display = 'none';
-            }, 350); // Match animation duration
-        }
-    }, 1000);
 });
 
 // Listen for trigger from main process
 ipcRenderer.on('trigger-quick-entry', () => {
     document.getElementById('command-input').focus();
-
-    // Show backdrop again briefly
-    const backdrop = document.getElementById('app-backdrop');
-    if (backdrop) {
-        backdrop.style.display = 'block';
-        backdrop.classList.remove('hiding');
-        backdrop.style.animation = 'none';
-        setTimeout(() => {
-            backdrop.style.animation = 'backdropFadeIn var(--transition-slow) ease-out forwards';
-        }, 10);
-
-        // Fade out after 1 second
-        setTimeout(() => {
-            backdrop.classList.add('hiding');
-            setTimeout(() => {
-                backdrop.style.display = 'none';
-            }, 350);
-        }, 1000);
-    }
 });
