@@ -1,6 +1,5 @@
 const Airtable = require('airtable');
 const chrono = require('chrono-node');
-const { ipcRenderer } = require('electron');
 
 class AirtableService {
     constructor() {
@@ -10,6 +9,7 @@ class AirtableService {
     }
 
     async initialize() {
+        const { ipcRenderer } = require('electron');
         const settings = await ipcRenderer.invoke('get-settings');
 
         if (!settings.airtableApiKey || !settings.airtableBaseId) {
