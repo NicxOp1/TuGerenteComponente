@@ -9,6 +9,7 @@ let currentAssignedTo = null;
 let currentFilter = 'all';
 let discordUsers = [];
 let currentUserDiscordId = null;
+let currentTags = [];
 
 // Initialize
 async function init() {
@@ -182,12 +183,18 @@ async function toggleTaskComplete(taskId) {
     if (!task) return;
 
     try {
-        await airtableService.updateTask(taskId, { completed: !task.completed });
+        const updatedTask = await airtableService.updateTask(taskId, { completed: !task.completed });
+
+        // Send Discord notification when completed
+        if (!task.completed) {
+            await airtableService.sendDiscordNotification(updatedTask, 'completed');
+        }
+
         await loadTasks();
-        showNotification(task.completed ? 'Task reopened' : 'Task completed!', 'success');
+        showNotification(task.completed ? 'Tarea reabierta' : '¡Tarea completada!', 'success');
     } catch (error) {
         console.error('Failed to toggle task:', error);
-        showNotification('Failed to update task', 'error');
+        showNotification('Error al actualizar tarea', 'error');
     }
 }
 
@@ -330,11 +337,74 @@ function setupEventListeners() {
     });
     document.getElementById('save-settings').addEventListener('click', saveSettings);
 
+    // Tags system - Enter to add tag
+    const labelsInput = document.getElementById('labels-input');
+    labelsInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const value = labelsInput.value.trim();
+            if (value) {
+                addTag(value);
+                labelsInput.value = '';
+            }
+        }
+    });
+
     // Click outside to hide time picker
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.date-time-picker')) {
             timePickerDropdown.classList.add('hidden');
         }
+    });
+}
+
+// Tags management
+function getRandomColor() {
+    const colors = [
+        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+        '#DFE6E9', '#74B9FF', '#A29BFE', '#FD79A8', '#FDCB6E',
+        '#6C5CE7', '#00B894', '#00CEC9', '#0984E3', '#E17055',
+        '#E84393', '#2D3436', '#636E72', '#B2BEC3', '#55EFC4'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function addTag(label) {
+    if (currentTags.includes(label)) return; // No duplicados
+
+    currentTags.push(label);
+    const color = getRandomColor();
+
+    const tagsContainer = document.getElementById('tags-container');
+    const tagEl = document.createElement('div');
+    tagEl.className = 'tag';
+    tagEl.style.backgroundColor = color;
+    tagEl.innerHTML = `
+        <span>${label}</span>
+        <span class="tag-remove" onclick="removeTag('${label.replace(/'/g, "\\'")}')">×</span>
+    `;
+
+    tagsContainer.appendChild(tagEl);
+}
+
+function removeTag(label) {
+    currentTags = currentTags.filter(t => t !== label);
+    renderTags();
+}
+
+function renderTags() {
+    const tagsContainer = document.getElementById('tags-container');
+    tagsContainer.innerHTML = '';
+    currentTags.forEach(label => {
+        const color = getRandomColor();
+        const tagEl = document.createElement('div');
+        tagEl.className = 'tag';
+        tagEl.style.backgroundColor = color;
+        tagEl.innerHTML = `
+            <span>${label}</span>
+            <span class="tag-remove" onclick="removeTag('${label.replace(/'/g, "\\'")}')">×</span>
+        `;
+        tagsContainer.appendChild(tagEl);
     });
 }
 
@@ -445,7 +515,6 @@ async function createTaskFromInput() {
 async function createTaskFromPanel() {
     const title = document.getElementById('command-input').value.trim();
     const dateText = document.getElementById('quick-date').value.trim();
-    const labelsText = document.getElementById('labels-input').value.trim();
     const notesText = document.getElementById('notes-input').value.trim();
 
     if (!title) {
@@ -458,7 +527,8 @@ async function createTaskFromPanel() {
         dueDate = airtableService.parseNaturalLanguageDate(dateText);
     }
 
-    const labels = labelsText ? labelsText.split(',').map(l => l.trim()).filter(l => l) : [];
+    // Use currentTags instead of labelsText
+    const labels = [...currentTags];
 
     // Get current user as requestedBy
     let requestedBy = null;
@@ -489,7 +559,7 @@ async function createTaskFromPanel() {
     });
 
     try {
-        await airtableService.createTask({
+        const newTask = await airtableService.createTask({
             title,
             type: currentType,
             area: currentArea || null,
@@ -500,6 +570,9 @@ async function createTaskFromPanel() {
             dueDate,
             notes: notesText || null
         });
+
+        // Send Discord notification
+        await airtableService.sendDiscordNotification(newTask, 'created');
 
         await loadTasks();
         resetForm();
@@ -525,6 +598,10 @@ function resetForm() {
     currentArea = '';
     currentAssignedTo = null;
     currentPriority = 'Alta';
+    currentTags = [];
+
+    // Clear tags
+    document.getElementById('tags-container').innerHTML = '';
 
     // Reset type buttons
     document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));

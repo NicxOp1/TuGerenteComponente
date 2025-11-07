@@ -85,8 +85,8 @@
                 <div class="date-time-picker">
                     <input type="text" id="quick-date" placeholder="mañana, 3d, próximo lunes..." class="date-input">
                     <button type="button" class="wheel-picker-trigger" id="open-wheel-picker">
-                        <span class="wheel-icon">🎯</span>
-                        Usar rueda
+                        <span class="wheel-icon">⏰</span>
+                        Seleccionar tiempo
                     </button>
                 </div>
             </div>
@@ -143,8 +143,9 @@
             <!-- Labels -->
             <div class="panel-section">
                 <label class="panel-label">Etiquetas</label>
+                <div class="tags-container" id="tags-container"></div>
                 <div class="labels-input-wrapper">
-                    <input type="text" id="labels-input" placeholder="Agregar etiquetas..." class="labels-input">
+                    <input type="text" id="labels-input" placeholder="Escribe y presiona Enter..." class="labels-input">
                 </div>
             </div>
 
@@ -182,26 +183,6 @@
                 <button class="btn-cancel" id="cancel-task">Cancelar</button>
                 <button class="btn-create" id="create-task">Crear</button>
             </div>
-        </div>
-
-        <!-- Filters Bar -->
-        <div id="filters-bar" class="filters-bar">
-            <button class="filter-btn active" data-filter="all">
-                Todas
-                <span class="filter-count" id="count-all">0</span>
-            </button>
-            <button class="filter-btn" data-filter="Tarea">
-                Tareas
-                <span class="filter-count" id="count-tareas">0</span>
-            </button>
-            <button class="filter-btn" data-filter="Ticket">
-                Tickets
-                <span class="filter-count" id="count-tickets">0</span>
-            </button>
-            <button class="filter-btn" data-filter="mine">
-                Mis asignaciones
-                <span class="filter-count" id="count-mine">0</span>
-            </button>
         </div>
 
         <!-- Tasks/Tickets List -->

@@ -52,10 +52,11 @@
     --space-xl: calc(var(--space-unit) * 6);   /* 48px */
 
     /* Border Radius */
-    --radius-sm: 6px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+    --radius-round: 40px;
 
     /* Transitions */
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -81,6 +82,30 @@ body {
     overflow: hidden;
 }
 
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 204, 0, 0.3);
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 204, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: var(--accent);
+}
+
 /* Main Overlay Container */
 .overlay-container {
     width: 100vw;
@@ -88,7 +113,7 @@ body {
     background: var(--bg-overlay);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-round);
     border: 1px solid var(--border);
     box-shadow: var(--shadow-lg), var(--glow);
     display: flex;
@@ -330,6 +355,49 @@ body {
 }
 
 /* Labels Input */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    min-height: 0;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: white;
+    animation: tagFadeIn 0.2s ease-out;
+}
+
+.tag-remove {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.tag-remove:hover {
+    opacity: 1;
+}
+
+@keyframes tagFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .labels-input-wrapper {
     position: relative;
 }

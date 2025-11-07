@@ -498,6 +498,133 @@ class AirtableService {
 
         return suggestions;
     }
+
+    // Discord Webhook
+    async sendDiscordNotification(task, action = 'created') {
+        const webhookUrl = 'https://discord.com/api/webhooks/1411830234445254697/3M-Jl16eaWtCO9MzsgZuo0vOQCOC67AdSwtwN274yj1oZrMtUKTLLFGOAXuJfyBUCTEr';
+
+        try {
+            // Get user info for mentions
+            let assignedToMention = '';
+            if (task.assignedToUser && task.assignedToUser.discordId) {
+                assignedToMention = `<@${task.assignedToUser.discordId}>`;
+            }
+
+            let requestedByMention = '';
+            if (task.requestedByUser && task.requestedByUser.discordId) {
+                requestedByMention = `<@${task.requestedByUser.discordId}>`;
+            }
+
+            // Color based on type
+            const typeColors = {
+                'Tarea': 0x3B82F6, // Blue
+                'Ticket': 0xFBBF24, // Yellow
+                'Bug': 0xEF4444, // Red
+                'Feature': 0x10B981 // Green
+            };
+
+            // Priority emoji
+            const priorityEmojis = {
+                'Baja': '🟢',
+                'Media': '🟡',
+                'Alta': '🔴',
+                'Urgente': '🚨'
+            };
+
+            const embed = {
+                title: `${action === 'created' ? '✨ Nueva' : action === 'updated' ? '✏️ Actualizada' : '✅ Completada'} ${task.type}: ${task.title}`,
+                color: typeColors[task.type] || 0xFFCC00,
+                fields: [
+                    {
+                        name: 'Prioridad',
+                        value: `${priorityEmojis[task.priority] || '⚪'} ${task.priority}`,
+                        inline: true
+                    }
+                ],
+                timestamp: new Date().toISOString(),
+                footer: {
+                    text: 'Tu Gerente - Sistema de Tickets'
+                }
+            };
+
+            if (task.area) {
+                embed.fields.push({
+                    name: 'Área',
+                    value: `📁 ${task.area}`,
+                    inline: true
+                });
+            }
+
+            if (assignedToMention) {
+                embed.fields.push({
+                    name: 'Asignado a',
+                    value: assignedToMention,
+                    inline: true
+                });
+            }
+
+            if (requestedByMention) {
+                embed.fields.push({
+                    name: 'Solicitado por',
+                    value: requestedByMention,
+                    inline: true
+                });
+            }
+
+            if (task.dueDate) {
+                const dueDateStr = new Date(task.dueDate).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                embed.fields.push({
+                    name: 'Fecha límite',
+                    value: `📅 ${dueDateStr}`,
+                    inline: false
+                });
+            }
+
+            if (task.labels && task.labels.length > 0) {
+                embed.fields.push({
+                    name: 'Etiquetas',
+                    value: task.labels.map(l => `\`${l}\``).join(' '),
+                    inline: false
+                });
+            }
+
+            if (task.notes) {
+                embed.fields.push({
+                    name: 'Notas',
+                    value: task.notes.substring(0, 1024), // Discord limit
+                    inline: false
+                });
+            }
+
+            let content = '';
+            if (assignedToMention) {
+                content = `${assignedToMention} Nueva tarea asignada!`;
+            }
+
+            const payload = {
+                content: content,
+                embeds: [embed]
+            };
+
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                console.error('Discord webhook error:', await response.text());
+            }
+        } catch (error) {
+            console.error('Failed to send Discord notification:', error);
+        }
+    }
 }
 
 // Create a singleton instance
