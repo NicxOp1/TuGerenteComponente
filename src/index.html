@@ -15,6 +15,11 @@
         <!-- Close Button -->
         <button class="close-btn" id="close-app" title="Ocultar (Ctrl+Shift+Q para cerrar completamente)">×</button>
 
+        <!-- Mute Button -->
+        <button class="mute-btn" id="mute-toggle" title="Silenciar sonidos (M)">
+            <span class="mute-icon">🔊</span>
+        </button>
+
         <!-- Quick Entry Command Input -->
         <div class="command-section">
             <div class="command-input-wrapper">
@@ -243,6 +248,23 @@
             <div class="modal-footer">
                 <button class="btn-cancel" id="cancel-settings">Cancelar</button>
                 <button class="btn-create" id="save-settings">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content confirm-modal-content">
+            <div class="modal-header">
+                <h3 id="confirm-title">Confirmar</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">¿Estás seguro?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="confirm-cancel">Cancelar</button>
+                <button class="btn-create" id="confirm-ok">Aceptar</button>
             </div>
         </div>
     </div>

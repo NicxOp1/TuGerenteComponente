@@ -242,12 +242,15 @@ function setupEventListeners() {
 
     // Command input - show panel when typing
     commandInput.addEventListener('input', () => {
+        const appContainer = document.querySelector('.overlay-container');
         if (commandInput.value.trim().length > 0) {
             taskPanel.classList.remove('hidden');
+            appContainer.classList.add('creating-task');
             // Apply predictions when panel opens
             applyPredictions();
         } else {
             taskPanel.classList.add('hidden');
+            appContainer.classList.remove('creating-task');
         }
     });
 
@@ -592,6 +595,9 @@ function resetForm() {
     document.getElementById('area-select').value = '';
     document.getElementById('assigned-to-select').value = '';
     document.getElementById('task-panel').classList.add('hidden');
+
+    // Remove creating-task class
+    document.querySelector('.overlay-container').classList.remove('creating-task');
 
     // Reset to defaults
     currentType = 'Tarea';
