@@ -5,27 +5,30 @@
 }
 
 :root {
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #252525;
-    --bg-tertiary: #2f2f2f;
-    --bg-hover: #353535;
-    --text-primary: #e0e0e0;
-    --text-secondary: #a0a0a0;
-    --text-tertiary: #707070;
-    --accent: #6366f1;
-    --accent-hover: #4f46e5;
-    --success: #10b981;
-    --danger: #ef4444;
-    --border: #3a3a3a;
-    --shadow: rgba(0, 0, 0, 0.3);
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #161616;
+    --bg-tertiary: #1e1e1e;
+    --bg-hover: #282828;
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --text-tertiary: #6e6e73;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --success: #30d158;
+    --danger: #ff453a;
+    --border: rgba(255, 255, 255, 0.08);
+    --shadow: rgba(0, 0, 0, 0.5);
+    --glass-bg: rgba(22, 22, 22, 0.7);
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     overflow: hidden;
     height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    font-size: 13px;
 }
 
 #app {
@@ -35,25 +38,27 @@ body {
 
 /* Sidebar */
 #sidebar {
-    width: 260px;
+    width: 200px;
     background: var(--bg-secondary);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 16px 12px;
 }
 
 .sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
+    padding: 0 4px;
 }
 
 .sidebar-header h1 {
-    font-size: 24px;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    background: linear-gradient(135deg, #0071e3, #00a8e8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -61,29 +66,32 @@ body {
 .icon-btn {
     background: transparent;
     border: none;
-    font-size: 18px;
+    font-size: 15px;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 6px;
-    transition: background 0.2s;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+    opacity: 0.6;
 }
 
 .icon-btn:hover {
     background: var(--bg-hover);
+    opacity: 1;
 }
 
 .lists-section {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .list-item {
     display: flex;
     align-items: center;
-    padding: 10px 12px;
-    border-radius: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s;
-    margin-bottom: 4px;
+    transition: background 0.15s ease;
+    margin-bottom: 2px;
+    font-size: 13px;
 }
 
 .list-item:hover {
@@ -92,49 +100,54 @@ body {
 
 .list-item.active {
     background: var(--bg-tertiary);
-    border-left: 3px solid var(--accent);
+    color: var(--accent);
 }
 
 .list-icon {
-    font-size: 18px;
-    margin-right: 10px;
+    font-size: 15px;
+    margin-right: 8px;
+    opacity: 0.9;
 }
 
 .list-name {
     flex: 1;
-    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: -0.2px;
 }
 
 .task-count {
-    background: var(--bg-tertiary);
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
 }
 
 .labels-section h3 {
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     color: var(--text-tertiary);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0 4px;
 }
 
 #labels-list {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .label-item {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 5px 8px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s;
-    font-size: 14px;
+    transition: background 0.15s ease;
+    font-size: 13px;
 }
 
 .label-item:hover {
@@ -142,10 +155,10 @@ body {
 }
 
 .label-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-right: 8px;
 }
 
 /* Main Content */
@@ -157,7 +170,7 @@ body {
 }
 
 .content-header {
-    padding: 20px 30px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
@@ -165,41 +178,44 @@ body {
 }
 
 .content-header h2 {
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
 }
 
 .header-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .btn-secondary {
-    background: var(--bg-tertiary);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border);
     color: var(--text-primary);
-    padding: 8px 16px;
+    padding: 5px 12px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
+    font-size: 12px;
+    transition: all 0.15s ease;
+    font-weight: 400;
 }
 
 .btn-secondary:hover {
-    background: var(--bg-hover);
-    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
 }
 
 .btn-primary {
     background: var(--accent);
     border: none;
     color: white;
-    padding: 10px 20px;
+    padding: 7px 16px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background 0.2s;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.15s ease;
+    letter-spacing: -0.2px;
 }
 
 .btn-primary:hover {
@@ -210,12 +226,12 @@ body {
     background: var(--danger);
     border: none;
     color: white;
-    padding: 10px 20px;
+    padding: 7px 16px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: opacity 0.2s;
+    font-size: 13px;
+    font-weight: 500;
+    transition: opacity 0.15s ease;
 }
 
 .btn-danger:hover {
@@ -224,57 +240,64 @@ body {
 
 /* Quick Entry */
 .quick-entry {
-    padding: 20px 30px;
+    padding: 12px 20px;
     border-bottom: 1px solid var(--border);
 }
 
 #quick-entry-input {
     width: 100%;
-    background: var(--bg-secondary);
-    border: 2px solid var(--border);
+    background: var(--bg-tertiary);
+    border: 1px solid transparent;
     color: var(--text-primary);
-    padding: 14px 18px;
+    padding: 10px 14px;
     border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.2s;
+    font-size: 13px;
+    transition: all 0.15s ease;
+    font-family: inherit;
+}
+
+#quick-entry-input::placeholder {
+    color: var(--text-tertiary);
 }
 
 #quick-entry-input:focus {
     outline: none;
     border-color: var(--accent);
+    background: var(--bg-secondary);
 }
 
 /* Tasks Container */
 #tasks-container {
     flex: 1;
     overflow-y: auto;
-    padding: 20px 30px;
+    padding: 12px 20px;
 }
 
 .task-item {
     display: flex;
     align-items: flex-start;
-    padding: 14px 16px;
+    padding: 10px 12px;
     background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s ease;
 }
 
 .task-item:hover {
     background: var(--bg-tertiary);
-    border-color: var(--accent);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
 }
 
 .task-checkbox {
-    width: 20px;
-    height: 20px;
-    margin-right: 14px;
+    width: 16px;
+    height: 16px;
+    margin-right: 12px;
     cursor: pointer;
     accent-color: var(--accent);
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 .task-content {
@@ -282,24 +305,26 @@ body {
 }
 
 .task-title {
-    font-size: 15px;
+    font-size: 13px;
     color: var(--text-primary);
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+    font-weight: 400;
 }
 
 .task-meta {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
     flex-wrap: wrap;
 }
 
 .task-date {
-    font-size: 13px;
+    font-size: 11px;
     color: var(--text-secondary);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
 }
 
 .task-date.overdue {
@@ -311,11 +336,12 @@ body {
 }
 
 .task-label {
-    font-size: 12px;
-    padding: 2px 8px;
+    font-size: 11px;
+    padding: 2px 7px;
     border-radius: 4px;
-    background: var(--bg-tertiary);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
+    font-weight: 500;
 }
 
 .task-item.completed .task-title {
@@ -330,12 +356,14 @@ body {
 }
 
 .empty-state-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.5;
 }
 
 .empty-state-text {
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: 400;
 }
 
 /* Modals */
@@ -345,12 +373,13 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.75);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 
 .modal.hidden {
@@ -358,30 +387,32 @@ body {
 }
 
 .modal-content {
-    background: var(--bg-secondary);
+    background: var(--glass-bg);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: 0 20px 60px var(--shadow);
-    max-width: 600px;
+    max-width: 480px;
     width: 90%;
     max-height: 80vh;
     overflow: hidden;
-    animation: modalSlideIn 0.2s ease-out;
+    animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes modalSlideIn {
     from {
-        transform: translateY(-20px);
+        transform: scale(0.96) translateY(-10px);
         opacity: 0;
     }
     to {
-        transform: translateY(0);
+        transform: scale(1) translateY(0);
         opacity: 1;
     }
 }
 
 .modal-header {
-    padding: 20px 24px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
@@ -389,18 +420,24 @@ body {
 }
 
 .modal-header h2 {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 600;
+    letter-spacing: -0.3px;
 }
 
 .close-btn {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
-    font-size: 28px;
+    color: var(--text-tertiary);
+    font-size: 24px;
     cursor: pointer;
     line-height: 1;
-    transition: color 0.2s;
+    transition: color 0.15s ease;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .close-btn:hover {
@@ -414,12 +451,13 @@ body {
 
 #command-input {
     width: 100%;
-    background: var(--bg-secondary);
+    background: transparent;
     border: none;
     border-bottom: 1px solid var(--border);
     color: var(--text-primary);
-    padding: 20px 24px;
-    font-size: 16px;
+    padding: 16px 20px;
+    font-size: 14px;
+    font-family: inherit;
 }
 
 #command-input:focus {
@@ -427,14 +465,14 @@ body {
 }
 
 #command-suggestions {
-    max-height: 400px;
+    max-height: 320px;
     overflow-y: auto;
 }
 
 .command-item {
-    padding: 12px 24px;
+    padding: 10px 20px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.15s ease;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -442,11 +480,11 @@ body {
 
 .command-item:hover,
 .command-item.selected {
-    background: var(--bg-hover);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .command-icon {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .command-text {
@@ -454,65 +492,71 @@ body {
 }
 
 .command-name {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-primary);
+    font-weight: 400;
 }
 
 .command-description {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-secondary);
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 .command-shortcut {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-tertiary);
-    background: var(--bg-tertiary);
+    background: rgba(255, 255, 255, 0.05);
     padding: 2px 6px;
     border-radius: 4px;
+    font-weight: 500;
 }
 
 /* Settings Modal */
 .settings-content {
-    max-width: 500px;
+    max-width: 420px;
 }
 
 .settings-body {
-    padding: 24px;
+    padding: 20px;
 }
 
 .setting-group {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .setting-group label {
     display: block;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 6px;
     color: var(--text-primary);
+    letter-spacing: -0.1px;
 }
 
 .setting-group input {
     width: 100%;
-    background: var(--bg-tertiary);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
     color: var(--text-primary);
-    padding: 10px 14px;
+    padding: 8px 12px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 13px;
+    font-family: inherit;
+    transition: all 0.15s ease;
 }
 
 .setting-group input:focus {
     outline: none;
     border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .setting-group small {
     display: block;
-    margin-top: 6px;
-    font-size: 12px;
-    color: var(--text-secondary);
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-tertiary);
 }
 
 .setting-group small a {
@@ -526,15 +570,15 @@ body {
 
 /* Task Detail Modal */
 .task-detail-content {
-    max-width: 600px;
+    max-width: 500px;
 }
 
 .task-detail-header {
-    padding: 20px 24px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .task-detail-title-input {
@@ -542,8 +586,9 @@ body {
     background: transparent;
     border: none;
     color: var(--text-primary);
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
 }
 
 .task-detail-title-input:focus {
@@ -551,38 +596,40 @@ body {
 }
 
 .task-detail-body {
-    padding: 24px;
+    padding: 20px;
     max-height: 60vh;
     overflow-y: auto;
 }
 
 .detail-section {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .detail-section label {
     display: block;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: var(--text-secondary);
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .detail-section input,
 .detail-section textarea {
     width: 100%;
-    background: var(--bg-tertiary);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
     color: var(--text-primary);
-    padding: 10px 14px;
+    padding: 8px 12px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 13px;
     font-family: inherit;
+    transition: all 0.15s ease;
 }
 
 .detail-section textarea {
-    min-height: 100px;
+    min-height: 80px;
     resize: vertical;
 }
 
@@ -590,26 +637,30 @@ body {
 .detail-section textarea:focus {
     outline: none;
     border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .detail-actions {
     display: flex;
-    gap: 10px;
-    margin-top: 24px;
+    gap: 8px;
+    margin-top: 20px;
 }
 
 /* Notification */
 .notification {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: var(--bg-secondary);
+    bottom: 16px;
+    right: 16px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border);
-    padding: 14px 20px;
+    padding: 12px 16px;
     border-radius: 8px;
     box-shadow: 0 10px 30px var(--shadow);
     z-index: 2000;
-    animation: slideIn 0.3s ease-out;
+    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 13px;
 }
 
 .notification.hidden {
@@ -617,11 +668,11 @@ body {
 }
 
 .notification.success {
-    border-left: 4px solid var(--success);
+    border-left: 3px solid var(--success);
 }
 
 .notification.error {
-    border-left: 4px solid var(--danger);
+    border-left: 3px solid var(--danger);
 }
 
 @keyframes slideIn {
@@ -638,42 +689,45 @@ body {
 /* Keyboard Hints */
 .keyboard-hints {
     position: fixed;
-    bottom: 10px;
+    bottom: 8px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 12px;
-    background: var(--bg-secondary);
+    gap: 8px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 12px;
-    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--text-tertiary);
 }
 
 .hint {
-    padding: 4px 8px;
-    background: var(--bg-tertiary);
+    padding: 3px 6px;
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 4px;
+    font-weight: 500;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--bg-tertiary);
-    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--bg-hover);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 /* Loading State */
@@ -681,6 +735,7 @@ body {
     text-align: center;
     padding: 40px;
     color: var(--text-secondary);
+    font-size: 13px;
 }
 
 .loading::after {
