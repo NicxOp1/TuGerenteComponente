@@ -67,6 +67,13 @@ app.on('will-quit', () => {
   globalShortcut.unregisterAll();
 });
 
+// IPC handlers for window control
+ipcMain.on('hide-window', () => {
+  if (mainWindow) {
+    mainWindow.hide();
+  }
+});
+
 // IPC handlers for settings
 ipcMain.handle('get-settings', () => {
   return store.get('settings', {

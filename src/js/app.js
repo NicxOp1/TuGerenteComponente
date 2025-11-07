@@ -315,9 +315,9 @@ function setupEventListeners() {
         resetForm();
     });
 
-    // Close app button
+    // Close app button - solo oculta
     document.getElementById('close-app').addEventListener('click', () => {
-        window.close();
+        ipcRenderer.send('hide-window');
     });
 
     // Settings
@@ -542,12 +542,20 @@ function resetForm() {
 // Keyboard shortcuts
 function setupKeyboardShortcuts() {
     document.addEventListener('keydown', (e) => {
-        // Escape to close
+        // Escape to hide (no cerrar)
         if (e.key === 'Escape') {
             const modals = document.querySelectorAll('.modal:not(.hidden)');
             if (modals.length > 0) {
                 modals.forEach(m => m.classList.add('hidden'));
             } else {
+                ipcRenderer.send('hide-window');
+            }
+        }
+
+        // Ctrl+Shift+Q para cerrar completamente
+        if (e.ctrlKey && e.shiftKey && e.key === 'Q') {
+            e.preventDefault();
+            if (confirm('¿Cerrar completamente la aplicación? (Se ocultará la ventana, usa Alt+L para volver a mostrarla)')) {
                 window.close();
             }
         }
