@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Godspeed</title>
+    <title>Godspeed - Gestor de Tareas y Tickets</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
         <div class="drag-handle"></div>
 
         <!-- Close Button -->
-        <button class="close-btn" id="close-app" title="Alt+L to close">×</button>
+        <button class="close-btn" id="close-app" title="Alt+L para cerrar">×</button>
 
         <!-- Quick Entry Command Input -->
         <div class="command-section">
@@ -23,25 +23,72 @@
                     type="text"
                     id="command-input"
                     class="command-input"
-                    placeholder="What needs to be done?"
+                    placeholder="¿Qué necesitas hacer?"
                     autocomplete="off"
                     autofocus
                 >
             </div>
-            <div class="command-hint">Press <kbd>Enter</kbd> to create • <kbd>↑↓</kbd> to navigate • <kbd>Esc</kbd> to close</div>
+            <div class="command-hint">
+                Presiona <kbd>Enter</kbd> para crear • <kbd>↑↓</kbd> para navegar • <kbd>Esc</kbd> para cerrar
+            </div>
         </div>
 
-        <!-- Task Creation Panel (appears when typing) -->
+        <!-- Task/Ticket Creation Panel -->
         <div id="task-panel" class="task-panel hidden">
+            <!-- Type Selector -->
             <div class="panel-section">
-                <label class="panel-label">Due</label>
+                <label class="panel-label">Tipo</label>
+                <div class="type-selector">
+                    <button class="type-btn active" data-type="Tarea">
+                        <span class="type-icon">✓</span>
+                        Tarea
+                    </button>
+                    <button class="type-btn" data-type="Ticket">
+                        <span class="type-icon">🎫</span>
+                        Ticket
+                    </button>
+                    <button class="type-btn" data-type="Bug">
+                        <span class="type-icon">🐛</span>
+                        Bug
+                    </button>
+                    <button class="type-btn" data-type="Feature">
+                        <span class="type-icon">✨</span>
+                        Feature
+                    </button>
+                </div>
+            </div>
+
+            <!-- Assignment Section -->
+            <div class="panel-section">
+                <label class="panel-label">Asignar a</label>
+                <select id="assigned-to-select" class="user-select">
+                    <option value="">Sin asignar</option>
+                </select>
+            </div>
+
+            <!-- Area Section -->
+            <div class="panel-section">
+                <label class="panel-label">Área</label>
+                <select id="area-select" class="area-select">
+                    <option value="">Seleccionar área</option>
+                    <option value="IA">IA</option>
+                    <option value="Contratos">Contratos</option>
+                    <option value="Dev">Dev</option>
+                    <option value="Operaciones">Operaciones</option>
+                    <option value="Marketing">Marketing</option>
+                </select>
+            </div>
+
+            <!-- Due Date -->
+            <div class="panel-section">
+                <label class="panel-label">Fecha límite</label>
                 <div class="date-time-picker">
-                    <input type="text" id="quick-date" placeholder="tomorrow, 3d, next monday..." class="date-input">
+                    <input type="text" id="quick-date" placeholder="mañana, 3d, próximo lunes..." class="date-input">
                     <div class="time-picker hidden" id="time-picker-dropdown">
-                        <div class="time-preset" data-time="9:00">Morning (9:00 AM)</div>
-                        <div class="time-preset" data-time="12:00">Noon (12:00 PM)</div>
-                        <div class="time-preset" data-time="15:00">Afternoon (3:00 PM)</div>
-                        <div class="time-preset" data-time="18:00">Evening (6:00 PM)</div>
+                        <div class="time-preset" data-time="9:00">Mañana (9:00 AM)</div>
+                        <div class="time-preset" data-time="12:00">Mediodía (12:00 PM)</div>
+                        <div class="time-preset" data-time="15:00">Tarde (3:00 PM)</div>
+                        <div class="time-preset" data-time="18:00">Noche (6:00 PM)</div>
                         <div class="time-divider"></div>
                         <div class="custom-time">
                             <input type="time" id="custom-time-input" class="time-input-field">
@@ -50,45 +97,71 @@
                 </div>
             </div>
 
+            <!-- Labels -->
             <div class="panel-section">
-                <label class="panel-label">Labels</label>
+                <label class="panel-label">Etiquetas</label>
                 <div class="labels-input-wrapper">
-                    <input type="text" id="labels-input" placeholder="Add labels..." class="labels-input">
-                    <div id="label-suggestions" class="label-suggestions hidden"></div>
+                    <input type="text" id="labels-input" placeholder="Agregar etiquetas..." class="labels-input">
                 </div>
             </div>
 
+            <!-- Priority -->
             <div class="panel-section">
-                <label class="panel-label">Priority</label>
+                <label class="panel-label">Prioridad</label>
                 <div class="priority-selector">
-                    <button class="priority-btn" data-priority="low">
+                    <button class="priority-btn" data-priority="Baja">
                         <span class="priority-dot low"></span>
-                        Low
+                        Baja
                     </button>
-                    <button class="priority-btn" data-priority="medium">
+                    <button class="priority-btn" data-priority="Media">
                         <span class="priority-dot medium"></span>
-                        Medium
+                        Media
                     </button>
-                    <button class="priority-btn active" data-priority="high">
+                    <button class="priority-btn active" data-priority="Alta">
                         <span class="priority-dot high"></span>
-                        High
+                        Alta
+                    </button>
+                    <button class="priority-btn" data-priority="Urgente">
+                        <span class="priority-dot urgent"></span>
+                        Urgente
                     </button>
                 </div>
             </div>
 
+            <!-- Actions -->
             <div class="panel-actions">
-                <button class="btn-cancel" id="cancel-task">Cancel</button>
-                <button class="btn-create" id="create-task">Create Task</button>
+                <button class="btn-cancel" id="cancel-task">Cancelar</button>
+                <button class="btn-create" id="create-task">Crear</button>
             </div>
         </div>
 
-        <!-- Tasks List -->
+        <!-- Filters Bar -->
+        <div id="filters-bar" class="filters-bar">
+            <button class="filter-btn active" data-filter="all">
+                Todas
+                <span class="filter-count" id="count-all">0</span>
+            </button>
+            <button class="filter-btn" data-filter="Tarea">
+                Tareas
+                <span class="filter-count" id="count-tareas">0</span>
+            </button>
+            <button class="filter-btn" data-filter="Ticket">
+                Tickets
+                <span class="filter-count" id="count-tickets">0</span>
+            </button>
+            <button class="filter-btn" data-filter="mine">
+                Mis asignaciones
+                <span class="filter-count" id="count-mine">0</span>
+            </button>
+        </div>
+
+        <!-- Tasks/Tickets List -->
         <div id="tasks-list" class="tasks-list">
             <!-- Empty State -->
             <div class="empty-state" id="empty-state">
                 <div class="empty-icon">✨</div>
-                <div class="empty-text">No tasks yet</div>
-                <div class="empty-subtext">Type above to create your first task</div>
+                <div class="empty-text">No hay tareas aún</div>
+                <div class="empty-subtext">Escribe arriba para crear tu primera tarea o ticket</div>
             </div>
         </div>
 
@@ -100,13 +173,13 @@
             </div>
             <div class="stat">
                 <span class="stat-value" id="today-count">0</span>
-                <span class="stat-label">today</span>
+                <span class="stat-label">hoy</span>
             </div>
             <div class="stat">
                 <span class="stat-value" id="completed-count">0</span>
-                <span class="stat-label">done</span>
+                <span class="stat-label">completadas</span>
             </div>
-            <button class="settings-icon" id="settings-btn" title="Settings">⚙️</button>
+            <button class="settings-icon" id="settings-btn" title="Configuración">⚙️</button>
         </div>
     </div>
 
@@ -115,26 +188,31 @@
         <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Settings</h3>
+                <h3>Configuración</h3>
                 <button class="modal-close" id="close-settings">×</button>
             </div>
             <div class="modal-body">
                 <div class="setting-group">
-                    <label>Airtable API Key</label>
-                    <input type="password" id="airtable-api-key" placeholder="Enter your API key">
+                    <label>API Key de Airtable</label>
+                    <input type="password" id="airtable-api-key" placeholder="Ingresa tu API key">
                 </div>
                 <div class="setting-group">
                     <label>Base ID</label>
                     <input type="text" id="airtable-base-id" placeholder="appXXXXXXXXXXXXXX">
                 </div>
                 <div class="setting-group">
-                    <label>Table Name</label>
+                    <label>Nombre de tabla Tasks</label>
                     <input type="text" id="airtable-table-name" value="tasks" placeholder="tasks">
+                </div>
+                <div class="setting-group">
+                    <label>Tu Discord ID (para asignaciones)</label>
+                    <input type="text" id="current-user-discord-id" placeholder="426822429147398145">
+                    <small>Ingresa tu Discord ID para ver tus tareas asignadas</small>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" id="cancel-settings">Cancel</button>
-                <button class="btn-create" id="save-settings">Save</button>
+                <button class="btn-cancel" id="cancel-settings">Cancelar</button>
+                <button class="btn-create" id="save-settings">Guardar</button>
             </div>
         </div>
     </div>
@@ -142,7 +220,6 @@
     <div id="notification" class="notification hidden"></div>
 
     <script src="js/airtable-service.js"></script>
-    <script src="js/ui.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

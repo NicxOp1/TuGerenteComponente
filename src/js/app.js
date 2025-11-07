@@ -2,17 +2,31 @@
 const { ipcRenderer } = require('electron');
 
 let allTasks = [];
-let currentPriority = 'high';
+let currentPriority = 'Alta';
+let currentType = 'Tarea';
+let currentArea = '';
+let currentAssignedTo = null;
+let currentFilter = 'all';
+let discordUsers = [];
+let currentUserDiscordId = null;
 
 // Initialize
 async function init() {
     console.log('Initializing Godspeed...');
 
+    // Load current user Discord ID from settings
+    const settings = await ipcRenderer.invoke('get-settings');
+    currentUserDiscordId = settings.currentUserDiscordId || null;
+
     const connected = await airtableService.initialize();
 
     if (!connected) {
-        showNotification('Configure Airtable in settings', 'error');
+        showNotification('Configura Airtable en ajustes', 'error');
     } else {
+        // Load Discord Users
+        discordUsers = airtableService.getDiscordUsers();
+        populateUserSelect();
+
         await loadTasks();
     }
 
@@ -21,6 +35,23 @@ async function init() {
 
     // Auto-focus command input
     document.getElementById('command-input').focus();
+}
+
+// Populate user selector
+function populateUserSelect() {
+    const select = document.getElementById('assigned-to-select');
+
+    // Clear existing options except the first one
+    while (select.options.length > 1) {
+        select.remove(1);
+    }
+
+    discordUsers.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.id;
+        option.textContent = `${user.name} (${user.role})`;
+        select.appendChild(option);
+    });
 }
 
 // Load tasks
@@ -44,7 +75,22 @@ function renderTasks() {
     const emptyState = document.getElementById('empty-state');
 
     // Filter active tasks only
-    const activeTasks = allTasks.filter(t => !t.completed);
+    let activeTasks = allTasks.filter(t => !t.completed);
+
+    // Apply current filter
+    if (currentFilter === 'Tarea') {
+        activeTasks = activeTasks.filter(t => t.type === 'Tarea');
+    } else if (currentFilter === 'Ticket') {
+        activeTasks = activeTasks.filter(t => t.type === 'Ticket');
+    } else if (currentFilter === 'mine') {
+        // Filter by current user's Discord ID
+        if (currentUserDiscordId) {
+            const currentUser = airtableService.getUserByDiscordId(currentUserDiscordId);
+            if (currentUser) {
+                activeTasks = activeTasks.filter(t => t.assignedTo === currentUser.id);
+            }
+        }
+    }
 
     if (activeTasks.length === 0) {
         emptyState.classList.remove('hidden');
@@ -70,12 +116,37 @@ function createTaskElement(task) {
     div.className = `task-item ${task.completed ? 'completed' : ''}`;
     div.dataset.taskId = task.id;
 
+    // Task header with type badge
+    const header = document.createElement('div');
+    header.className = 'task-header';
+
+    const typeBadge = document.createElement('span');
+    typeBadge.className = `task-type-badge ${task.type}`;
+    typeBadge.textContent = task.type;
+    header.appendChild(typeBadge);
+
     const title = document.createElement('div');
     title.className = 'task-title';
     title.textContent = task.title;
 
     const meta = document.createElement('div');
     meta.className = 'task-meta';
+
+    // Add assignee if exists
+    if (task.assignedToUser) {
+        const assigneeSpan = document.createElement('span');
+        assigneeSpan.className = 'task-assignee';
+        assigneeSpan.textContent = `👤 ${task.assignedToUser.name}`;
+        meta.appendChild(assigneeSpan);
+    }
+
+    // Add area if exists
+    if (task.area) {
+        const areaSpan = document.createElement('span');
+        areaSpan.className = 'task-area';
+        areaSpan.textContent = `📁 ${task.area}`;
+        meta.appendChild(areaSpan);
+    }
 
     if (task.dueDate) {
         const dateSpan = document.createElement('span');
@@ -93,6 +164,7 @@ function createTaskElement(task) {
         });
     }
 
+    div.appendChild(header);
     div.appendChild(title);
     div.appendChild(meta);
 
@@ -128,6 +200,24 @@ function updateStats() {
     document.getElementById('total-count').textContent = total;
     document.getElementById('today-count').textContent = today;
     document.getElementById('completed-count').textContent = completed;
+
+    // Update filter counts
+    const countAll = allTasks.filter(t => !t.completed).length;
+    const countTareas = allTasks.filter(t => !t.completed && t.type === 'Tarea').length;
+    const countTickets = allTasks.filter(t => !t.completed && t.type === 'Ticket').length;
+
+    let countMine = 0;
+    if (currentUserDiscordId) {
+        const currentUser = airtableService.getUserByDiscordId(currentUserDiscordId);
+        if (currentUser) {
+            countMine = allTasks.filter(t => !t.completed && t.assignedTo === currentUser.id).length;
+        }
+    }
+
+    document.getElementById('count-all').textContent = countAll;
+    document.getElementById('count-tareas').textContent = countTareas;
+    document.getElementById('count-tickets').textContent = countTickets;
+    document.getElementById('count-mine').textContent = countMine;
 }
 
 // Show empty state
@@ -173,12 +263,41 @@ function setupEventListeners() {
         });
     });
 
+    // Type buttons
+    document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentType = btn.dataset.type;
+        });
+    });
+
     // Priority buttons
     document.querySelectorAll('.priority-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentPriority = btn.dataset.priority;
+        });
+    });
+
+    // Area selector
+    document.getElementById('area-select').addEventListener('change', (e) => {
+        currentArea = e.target.value;
+    });
+
+    // Assigned to selector
+    document.getElementById('assigned-to-select').addEventListener('change', (e) => {
+        currentAssignedTo = e.target.value || null;
+    });
+
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderTasks();
         });
     });
 
@@ -245,7 +364,7 @@ async function createTaskFromPanel() {
     const labelsText = document.getElementById('labels-input').value.trim();
 
     if (!title) {
-        showNotification('Please enter a task title', 'error');
+        showNotification('Por favor ingresa un título', 'error');
         return;
     }
 
@@ -256,20 +375,33 @@ async function createTaskFromPanel() {
 
     const labels = labelsText ? labelsText.split(',').map(l => l.trim()).filter(l => l) : [];
 
+    // Get current user as requestedBy
+    let requestedBy = null;
+    if (currentUserDiscordId) {
+        const currentUser = airtableService.getUserByDiscordId(currentUserDiscordId);
+        if (currentUser) {
+            requestedBy = currentUser.id;
+        }
+    }
+
     try {
         await airtableService.createTask({
             title,
+            type: currentType,
+            area: currentArea || null,
+            assignedTo: currentAssignedTo,
+            requestedBy: requestedBy,
+            priority: currentPriority,
             labels,
-            dueDate,
-            priority: currentPriority
+            dueDate
         });
 
         await loadTasks();
         resetForm();
-        showNotification('Task created!', 'success');
+        showNotification('¡Tarea creada!', 'success');
     } catch (error) {
         console.error('Failed to create task:', error);
-        showNotification('Failed to create task', 'error');
+        showNotification('Error al crear tarea', 'error');
     }
 }
 
@@ -278,7 +410,24 @@ function resetForm() {
     document.getElementById('command-input').value = '';
     document.getElementById('quick-date').value = '';
     document.getElementById('labels-input').value = '';
+    document.getElementById('area-select').value = '';
+    document.getElementById('assigned-to-select').value = '';
     document.getElementById('task-panel').classList.add('hidden');
+
+    // Reset to defaults
+    currentType = 'Tarea';
+    currentArea = '';
+    currentAssignedTo = null;
+    currentPriority = 'Alta';
+
+    // Reset type buttons
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.type-btn[data-type="Tarea"]').classList.add('active');
+
+    // Reset priority buttons
+    document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.priority-btn[data-priority="Alta"]').classList.add('active');
+
     document.getElementById('command-input').focus();
 }
 
@@ -310,6 +459,7 @@ async function openSettings() {
     document.getElementById('airtable-api-key').value = settings.airtableApiKey || '';
     document.getElementById('airtable-base-id').value = settings.airtableBaseId || '';
     document.getElementById('airtable-table-name').value = settings.airtableTableName || 'tasks';
+    document.getElementById('current-user-discord-id').value = settings.currentUserDiscordId || '';
 
     showModal('settings-modal');
 }
@@ -318,19 +468,25 @@ async function saveSettings() {
     const settings = {
         airtableApiKey: document.getElementById('airtable-api-key').value,
         airtableBaseId: document.getElementById('airtable-base-id').value,
-        airtableTableName: document.getElementById('airtable-table-name').value || 'tasks'
+        airtableTableName: document.getElementById('airtable-table-name').value || 'tasks',
+        currentUserDiscordId: document.getElementById('current-user-discord-id').value
     };
 
     await ipcRenderer.invoke('save-settings', settings);
+    currentUserDiscordId = settings.currentUserDiscordId || null;
     hideModal('settings-modal');
 
     const connected = await airtableService.initialize();
 
     if (connected) {
-        showNotification('Settings saved!', 'success');
+        // Reload Discord Users
+        discordUsers = airtableService.getDiscordUsers();
+        populateUserSelect();
+
+        showNotification('¡Configuración guardada!', 'success');
         await loadTasks();
     } else {
-        showNotification('Failed to connect to Airtable', 'error');
+        showNotification('Error al conectar con Airtable', 'error');
     }
 }
 

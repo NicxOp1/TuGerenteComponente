@@ -5,7 +5,9 @@ class AirtableService {
     constructor() {
         this.base = null;
         this.table = null;
+        this.discordUsersTable = null;
         this.isConnected = false;
+        this.discordUsers = [];
     }
 
     async initialize() {
@@ -23,13 +25,57 @@ class AirtableService {
 
             this.base = Airtable.base(settings.airtableBaseId);
             this.table = this.base(settings.airtableTableName || 'Tasks');
+            this.discordUsersTable = this.base('Discord Users');
             this.isConnected = true;
+
+            // Load Discord Users
+            await this.loadDiscordUsers();
+
             return true;
         } catch (error) {
             console.error('Failed to initialize Airtable:', error);
             this.isConnected = false;
             return false;
         }
+    }
+
+    async loadDiscordUsers() {
+        if (!this.isConnected) {
+            return;
+        }
+
+        try {
+            const records = [];
+            await this.discordUsersTable.select().eachPage((pageRecords, fetchNextPage) => {
+                pageRecords.forEach(record => {
+                    records.push({
+                        id: record.id,
+                        name: record.fields.Name || '',
+                        discordId: record.fields['Discord ID'] || '',
+                        role: record.fields.Role || ''
+                    });
+                });
+                fetchNextPage();
+            });
+
+            this.discordUsers = records;
+            console.log('Discord Users loaded:', this.discordUsers.length);
+        } catch (error) {
+            console.error('Failed to load Discord Users:', error);
+            this.discordUsers = [];
+        }
+    }
+
+    getDiscordUsers() {
+        return this.discordUsers;
+    }
+
+    getUserById(userId) {
+        return this.discordUsers.find(u => u.id === userId);
+    }
+
+    getUserByDiscordId(discordId) {
+        return this.discordUsers.find(u => u.discordId === discordId);
     }
 
     parseNaturalLanguageDate(text) {
@@ -74,6 +120,26 @@ class AirtableService {
                 Status: 'Todo',
                 Completed: false
             };
+
+            if (taskData.type) {
+                fields.Type = taskData.type;
+            }
+
+            if (taskData.area) {
+                fields.Area = taskData.area;
+            }
+
+            if (taskData.priority) {
+                fields.Priority = taskData.priority;
+            }
+
+            if (taskData.assignedTo) {
+                fields.AssignedTo = [taskData.assignedTo]; // Array for linked record
+            }
+
+            if (taskData.requestedBy) {
+                fields.RequestedBy = [taskData.requestedBy]; // Array for linked record
+            }
 
             if (taskData.dueDate) {
                 fields.DueDate = taskData.dueDate.toISOString().split('T')[0];
@@ -150,6 +216,26 @@ class AirtableService {
                 fields.Name = updates.title;
             }
 
+            if (updates.type !== undefined) {
+                fields.Type = updates.type;
+            }
+
+            if (updates.area !== undefined) {
+                fields.Area = updates.area;
+            }
+
+            if (updates.priority !== undefined) {
+                fields.Priority = updates.priority;
+            }
+
+            if (updates.assignedTo !== undefined) {
+                fields.AssignedTo = updates.assignedTo ? [updates.assignedTo] : [];
+            }
+
+            if (updates.requestedBy !== undefined) {
+                fields.RequestedBy = updates.requestedBy ? [updates.requestedBy] : [];
+            }
+
             if (updates.completed !== undefined) {
                 fields.Completed = updates.completed;
                 if (updates.completed) {
@@ -215,15 +301,36 @@ class AirtableService {
 
     formatRecord(record) {
         const fields = record.fields;
+
+        // Get assigned user info
+        let assignedToUser = null;
+        if (fields.AssignedTo && fields.AssignedTo.length > 0) {
+            assignedToUser = this.getUserById(fields.AssignedTo[0]);
+        }
+
+        // Get requested by user info
+        let requestedByUser = null;
+        if (fields.RequestedBy && fields.RequestedBy.length > 0) {
+            requestedByUser = this.getUserById(fields.RequestedBy[0]);
+        }
+
         return {
             id: record.id,
             title: fields.Name || '',
+            type: fields.Type || 'Tarea',
+            area: fields.Area || '',
+            priority: fields.Priority || 'Media',
+            assignedTo: fields.AssignedTo && fields.AssignedTo.length > 0 ? fields.AssignedTo[0] : null,
+            assignedToUser: assignedToUser,
+            requestedBy: fields.RequestedBy && fields.RequestedBy.length > 0 ? fields.RequestedBy[0] : null,
+            requestedByUser: requestedByUser,
             completed: fields.Completed || false,
             dueDate: fields.DueDate ? new Date(fields.DueDate) : null,
             labels: fields.Labels ? fields.Labels.split(',').map(l => l.trim()) : [],
             notes: fields.Notes || '',
             created: fields.Created ? new Date(fields.Created) : new Date(),
-            completedDate: fields.CompletedDate ? new Date(fields.CompletedDate) : null
+            completedDate: fields.CompletedDate ? new Date(fields.CompletedDate) : null,
+            ticketNumber: fields.TicketNumber || ''
         };
     }
 
