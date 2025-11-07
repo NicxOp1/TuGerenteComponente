@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Godspeed - Gestor de Tareas y Tickets</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Main Overlay Container -->
+    <div id="app" class="overlay-container">
+        <!-- Drag Handle -->
+        <div class="drag-handle"></div>
+
+        <!-- Close Button -->
+        <button class="close-btn" id="close-app" title="Ocultar (Ctrl+Shift+Q para cerrar completamente)">×</button>
+
+        <!-- Mute Button -->
+        <button class="mute-btn" id="mute-toggle" title="Silenciar sonidos (M)">
+            <span class="mute-icon">🔊</span>
+        </button>
+
+        <!-- Quick Entry Command Input -->
+        <div class="command-section">
+            <div class="command-input-wrapper">
+                <span class="command-icon">⚡</span>
+                <input
+                    type="text"
+                    id="command-input"
+                    class="command-input"
+                    placeholder="¿Qué necesitas hacer?"
+                    autocomplete="off"
+                    autofocus
+                >
+            </div>
+            <div class="command-hint">
+                Presiona <kbd>Enter</kbd> para crear • <kbd>Esc</kbd> para ocultar • <kbd>Ctrl+Shift+Q</kbd> para cerrar completamente
+            </div>
+        </div>
+
+        <!-- Task/Ticket Creation Panel -->
+        <div id="task-panel" class="task-panel hidden">
+            <!-- Type Selector -->
+            <div class="panel-section">
+                <label class="panel-label">Tipo</label>
+                <div class="type-selector">
+                    <button class="type-btn active" data-type="Tarea">
+                        <span class="type-icon">✓</span>
+                        Tarea
+                    </button>
+                    <button class="type-btn" data-type="Ticket">
+                        <span class="type-icon">🎫</span>
+                        Ticket
+                    </button>
+                    <button class="type-btn" data-type="Bug">
+                        <span class="type-icon">🐛</span>
+                        Bug
+                    </button>
+                    <button class="type-btn" data-type="Feature">
+                        <span class="type-icon">✨</span>
+                        Feature
+                    </button>
+                </div>
+            </div>
+
+            <!-- Assignment Section -->
+            <div class="panel-section">
+                <label class="panel-label">Asignar a</label>
+                <select id="assigned-to-select" class="user-select">
+                    <option value="">Sin asignar</option>
+                </select>
+            </div>
+
+            <!-- Area Section -->
+            <div class="panel-section">
+                <label class="panel-label">Área</label>
+                <select id="area-select" class="area-select">
+                    <option value="">Seleccionar área</option>
+                    <option value="IA">IA</option>
+                    <option value="Contratos">Contratos</option>
+                    <option value="Dev">Dev</option>
+                    <option value="Operaciones">Operaciones</option>
+                    <option value="Marketing">Marketing</option>
+                </select>
+            </div>
+
+            <!-- Due Date -->
+            <div class="panel-section">
+                <label class="panel-label">Fecha límite</label>
+                <div class="date-time-picker">
+                    <input type="text" id="quick-date" placeholder="mañana, 3d, próximo lunes..." class="date-input">
+                    <button type="button" class="wheel-picker-trigger" id="open-wheel-picker">
+                        <span class="wheel-icon">⏰</span>
+                        Seleccionar tiempo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Wheel Date/Time Picker Modal -->
+            <div id="wheel-picker-modal" class="modal hidden">
+                <div class="modal-overlay"></div>
+                <div class="modal-content wheel-picker-content">
+                    <div class="modal-header">
+                        <h3>Ajustar fecha y hora</h3>
+                        <button class="modal-close" id="close-wheel-picker">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="wheel-picker-container">
+                            <!-- Days Wheel -->
+                            <div class="wheel-column">
+                                <div class="wheel-label">Días</div>
+                                <div class="wheel" id="days-wheel" data-type="days">
+                                    <canvas id="days-canvas" width="120" height="120"></canvas>
+                                    <div class="wheel-value" id="days-value">0</div>
+                                </div>
+                            </div>
+
+                            <!-- Hours Wheel -->
+                            <div class="wheel-column">
+                                <div class="wheel-label">Horas</div>
+                                <div class="wheel" id="hours-wheel" data-type="hours">
+                                    <canvas id="hours-canvas" width="120" height="120"></canvas>
+                                    <div class="wheel-value" id="hours-value">0</div>
+                                </div>
+                            </div>
+
+                            <!-- Minutes Wheel -->
+                            <div class="wheel-column">
+                                <div class="wheel-label">Minutos</div>
+                                <div class="wheel" id="minutes-wheel" data-type="minutes">
+                                    <canvas id="minutes-canvas" width="120" height="120"></canvas>
+                                    <div class="wheel-value" id="minutes-value">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wheel-preview">
+                            <span class="preview-label">Vista previa:</span>
+                            <span class="preview-value" id="wheel-preview">Ahora</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-cancel" id="cancel-wheel-picker">Cancelar</button>
+                        <button class="btn-create" id="apply-wheel-picker">Aplicar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labels -->
+            <div class="panel-section">
+                <label class="panel-label">Etiquetas</label>
+                <div class="tags-container" id="tags-container"></div>
+                <div class="labels-input-wrapper">
+                    <input type="text" id="labels-input" placeholder="Escribe y presiona Enter..." class="labels-input">
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="panel-section">
+                <label class="panel-label">Notas</label>
+                <textarea id="notes-input" class="notes-input" placeholder="Agrega notas o detalles adicionales..." rows="3"></textarea>
+            </div>
+
+            <!-- Priority -->
+            <div class="panel-section">
+                <label class="panel-label">Prioridad</label>
+                <div class="priority-selector">
+                    <button class="priority-btn" data-priority="Baja">
+                        <span class="priority-dot low"></span>
+                        Baja
+                    </button>
+                    <button class="priority-btn" data-priority="Media">
+                        <span class="priority-dot medium"></span>
+                        Media
+                    </button>
+                    <button class="priority-btn active" data-priority="Alta">
+                        <span class="priority-dot high"></span>
+                        Alta
+                    </button>
+                    <button class="priority-btn" data-priority="Urgente">
+                        <span class="priority-dot urgent"></span>
+                        Urgente
+                    </button>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="panel-actions">
+                <button class="btn-cancel" id="cancel-task">Cancelar</button>
+                <button class="btn-create" id="create-task">Crear</button>
+            </div>
+        </div>
+
+        <!-- Tasks/Tickets List -->
+        <div id="tasks-list" class="tasks-list">
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state">
+                <div class="empty-icon">✨</div>
+                <div class="empty-text">No hay tareas aún</div>
+                <div class="empty-subtext">Escribe arriba para crear tu primera tarea o ticket</div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <div class="footer-stats">
+            <div class="stat">
+                <span class="stat-value" id="total-count">0</span>
+                <span class="stat-label">total</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="today-count">0</span>
+                <span class="stat-label">hoy</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="completed-count">0</span>
+                <span class="stat-label">completadas</span>
+            </div>
+            <button class="settings-icon" id="settings-btn" title="Configuración">⚙️</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configuración</h3>
+                <button class="modal-close" id="close-settings">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label>API Key de Airtable</label>
+                    <input type="password" id="airtable-api-key" placeholder="Ingresa tu API key">
+                </div>
+                <div class="setting-group">
+                    <label>Base ID</label>
+                    <input type="text" id="airtable-base-id" placeholder="appXXXXXXXXXXXXXX">
+                </div>
+                <div class="setting-group">
+                    <label>Nombre de tabla Tasks</label>
+                    <input type="text" id="airtable-table-name" value="tasks" placeholder="tasks">
+                </div>
+                <div class="setting-group">
+                    <label>Tu Discord ID (para asignaciones)</label>
+                    <input type="text" id="current-user-discord-id" placeholder="426822429147398145">
+                    <small>Ingresa tu Discord ID para ver tus tareas asignadas</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancel-settings">Cancelar</button>
+                <button class="btn-create" id="save-settings">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content confirm-modal-content">
+            <div class="modal-header">
+                <h3 id="confirm-title">Confirmar</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">¿Estás seguro?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="confirm-cancel">Cancelar</button>
+                <button class="btn-create" id="confirm-ok">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification hidden"></div>
+
+    <script src="js/airtable-service.js"></script>
+    <script src="js/wheel-picker.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
