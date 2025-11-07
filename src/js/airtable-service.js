@@ -72,7 +72,6 @@ class AirtableService {
             const fields = {
                 Name: taskData.title,
                 Status: 'Todo',
-                Created: new Date().toISOString(),
                 Completed: false
             };
 
